@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="ACME : A toolbox for the simulation and analysis of stochastic chemical kinetics">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>ACME FAQ</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/akazeroonian/ACME">View on GitHub</a>
+
+          <h1 id="project_title">ACME</h1>
+          <h2 id="project_tagline">A toolbox for the simulation and analysis of stochastic chemical kinetics</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/akazeroonian/ACME/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/akazeroonian/ACME/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>
+<a id="description" class="anchor" href="#description" aria-hidden="true"><span class="octicon octicon-link"></span></a>FAQ</h2>
+
+<pre><code>Q: Should I provide the initial conditions in 
+   molecule numbers or concentrations?
+
+A: The initial conditions should always be provided in molecule numbers. 
+   If the equations are to be provided for concentrations, the 
+   user-provided initial conditions will be automatically
+   converted to concentrations.
+</code></pre>
+
+<br><br>
+
+<pre><code>Q: How to evaluate a least-squares objective function together 
+   with the simulation?
+
+A: To evaluate a least-squares likelihood function, one should use the 
+   llhwrapper to compile the simulation files. 
+   Please refer to the llhwrapper section in the ACME documentation 
+   for more details.
+</code></pre>
+
+<br><br>
+
+<pre><code>Q: How can I define observables/measured variables?
+
+A: The observables can be defined as outputs of the system. Corresponding 
+   scaling and offset parameters can also be defined as additional 
+   parameters of the system. 
+   Please refer to the "Model definition file" section in the ACME 
+   documentation for more details.
+</code></pre>
+
+<br><br>
+
+<pre><code>Q: How can I change the initial condition after compiling the 
+   simulation files?
+
+A: The desired set of initial conditions can be passed to the simulation 
+   MEX-file as an input argument.
+   Please refer to the Numerical Simulation Chapter in the ACME 
+   documentation for more details.
+</code></pre>
+
+<br><br>
+
+<pre><code>Q: How do I specify the scale of the equations, e.g., molecule numbers
+   or concentrations?
+
+A: The scale of the equations depends on the selected modeling approach. 
+   Some approaches provide the equations only in concentration scale, and 
+   for others the desired scale can be specified. 
+   Please refer to "Selection of modeling approach" section in the ACME 
+   documentation for more details.
+</code></pre>
+
+<br><br>
+
+<pre><code>Q: For which parameters are the sensitivity equations derived and simulated?
+
+A: The sensitivity equations are derived for all non-constant parameters, 
+   i.e. those defined as System.parameter and not as System.kappa. However, 
+   when calling the simulation MEX-file, the user can specify which 
+   sensitivity equations are to be solved. Please refer to 
+   "Sensitivity Analysis" Section in the ACME documentation for 
+   more details.
+</code></pre>
+
+<br>
+<br>
+
+
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">ACME maintained by <a href="https://github.com/akazeroonian/">akazeroonian</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
