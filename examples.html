@@ -16,14 +16,14 @@
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
-          <a id="forkme_banner" href="https://github.com/akazeroonian/ACME">View on GitHub</a>
+          <a id="forkme_banner" href="https://github.com/ACMEDevelopers/ACME">View on GitHub</a>
 
           <h1 id="project_title">ACME</h1>
           <h2 id="project_tagline">A toolbox for the simulation and analysis of stochastic chemical kinetics</h2>
 
             <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/akazeroonian/ACME/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/akazeroonian/ACME/tarball/master">Download this project as a tar.gz file</a>
+              <a class="zip_download_link" href="https://github.com/ACMEDevelopers/ACME/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/ACMEDevelopers/ACME/tarball/master">Download this project as a tar.gz file</a>
             </section>
         </header>
     </div>
@@ -32,10 +32,13 @@
     
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h2>
-<a id="description" class="anchor" href="#description" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
 
-<p><img src="https://github.com/akazeroonian/ACME/raw/master/ACME/examples/JakStat/Jak_simulation_result.png" alt="Schematic of the JAK-STAT pathway"></p>
+<h2><a id="description" class="anchor" href="#description" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
+<p>For in-depth description and additional information please refer to the <a href="https://github.com/ACMEDevelopers/ACME/raw/master/supplement.pdf">supplement</a>!</p>
+<br>
+
+<h3><a aria-hidden="true"><span class="octicon octicon-link"></span></a>JAK-STAT signaling pathway</h3>
+<p><img src="https://github.com/ACMEDevelopers/ACME/raw/master/ACME/examples/JakStat/images/Jak_simulation_result.png" alt="Schematic of the JAK-STAT pathway"></p>
 
 <p>Schematic of the simpliﬁed JAK-STAT signaling pathway.
 Upon activation, the Epo receptor triggers the phosphorylation of cytoplasmic STAT followed by dimerization and translocation of phosphorylated STAT into the nucleus.</p>
@@ -44,12 +47,17 @@ Upon activation, the Epo receptor triggers the phosphorylation of cytoplasmic ST
 
 <p>ACME can be used to describe the dynamics of JAK-STAT signaling pathway and proved to be more efficient than other packages/implementations.</p>
 
+<p>This pathway is simulated using several modeling approaches, including stochastic simulation algorithms (SSA).</p>
+<p>An example of a live correlation simulation can be viewed <a href="https://github.com/ACMEDevelopers/ACME/blob/master/ACME/examples/JakStat/images/corr_JakStat.gif">here</a>.</p>
+<p>The SSA simulation results were plotted and are depicted <a href="plots.html">here</a>.</p>
+
+
 <br>
 
-<h2>
-<a id="user-content-the-three-stage-gene-expression-model" class="anchor" href="#the-three-stage-gene-expression-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>The three-stage gene expression model</h2>
+<h3>
+<a id="user-content-the-three-stage-gene-expression-model" class="anchor" href="#the-three-stage-gene-expression-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>The three-stage gene expression model</h3>
 
-<p><img src="https://github.com/akazeroonian/ACME/raw/master/ACME/examples/3_stages_gene_model.png" alt="Three-stage gene expression model"></p>
+<p><img src="https://github.com/ACMEDevelopers/ACME/raw/master/ACME/examples/geneExpression/images/3_stages_gene_model.png" alt="Three-stage gene expression model"></p>
 
 <p>The three-stage gene expression model (Shahrezaei and Swain, 2008) is extended by a feedback loop to introduce a nonlinearity.  </p>
 
@@ -62,7 +70,27 @@ loop.</p>
 <p>This process was implemented and simulated in ACME and yielded results which agree well with the
 reference solution.</p>
 
+<p>The plots obtained by this example can be found <a href="plots.html#gene">here</a>.</p>
+
 <br>
+
+<h3>
+<a id="user-content-PapI-regulation-model" class="anchor" href="#PapI-regulation-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>PapI regulation model</h2>
+</h3>
+<p><img src="https://github.com/ACMEDevelopers/ACME/raw/master/ACME/examples/PapI/images/PapI_regulation_model.png" alt="PapI regulation model"></p>
+
+<p>Schematic of the PapI regulation model.</p>
+<p>Arrows represent the binding and unbinding of LRP to/from the operon. Dotted arrows indicate the inﬂuence of 
+PapI on the reaction rates.</p>
+
+<p>Only if the
+operon is in state g2 , pili can be produced. PapI sets up a a positive feedback loop for the production of pili
+by reducing the unbinding rate of LRP from the operon.</p>
+
+<p>This process is an interesting application example as it involves non-polynomial propensity functions. The
+model deﬁnition and simulation ﬁles for this system can be found in ACME/examples/PapI. The plots are illustrated <a href="plots.html#papi">here</a>.</p>
+
+
 <br>
 <br>
 
@@ -72,7 +100,7 @@ reference solution.</p>
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p class="copyright">ACME maintained by <a href="https://github.com/akazeroonian/">akazeroonian</a></p>
+        <p class="copyright">ACME maintained by <a href="https://github.com/ACMEDevelopers/">ACMEDevelopers</a></p>
         <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
