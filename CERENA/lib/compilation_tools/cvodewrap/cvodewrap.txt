@@ -1,0 +1,44 @@
+DOCUMENTATION CVODEWRAP
+
+%%%% MODEL SPECIFICATION %%%%
+
+setup the .m file that returns the model struct and name it 'yourmodelmfile'.
+the returned model struct must have a field 'sym' that has fields containing the symbolic representation of
+
+- x the states
+- p the parameters
+- u the input
+- xdot the right hand side of the differential equation
+- x0 the initial conditions
+- y the observables
+
+furthermore you can specify solver specific parameters as the fields
+
+- atol: absolute integration error tolerance
+- rtol: relative integration error tolerance
+- maxsteps: maximum number of allowed integration steps
+
+%%%% COMPILING THE MODEL %%%%
+
+To compile your model call cvodewrap('yourmodelname','yourmodelmfile') in matlab. Here you
+ have to make sure that yourmodelmfile is contained within your matlab path.
+ This will generate the folder './models/yourmodelname' which contains the .c files and 
+ respective headers for compilation as well as the 'yourmodelname.mex' file to simulate the system and a 
+ matlab wrapper function 'simulate_yourmodelname.m' that eases the use of the simulation routine.
+ The notation to call the matlab wrapper is 
+ 
+ [status,t,x,y,sx,sy] = simulate_yourmodelname(tout,theta)
+ 
+ where tout are the timepoints at which the states and observables should be returned and 
+ theta is the vector of system parameters.
+ status is the flag returned by CVODES whether the integration was successful or not.
+ t should be the vector of timepoints but currently is a vector of zeros
+ x and y are states and observables of the system and sx and sy are their respective 
+ sensitivities.
+
+
+%%%% CURRENTLY NOT SUPPORTED BUT PLANNED %%%%
+- support for non-autonomous ODEs
+- support for DEA
+- specification of t0, currently this can be done by setting options.tstart in simulate_'yourmodelname'
+- currently the returned vector t does not contain the time-vector specified in tout.

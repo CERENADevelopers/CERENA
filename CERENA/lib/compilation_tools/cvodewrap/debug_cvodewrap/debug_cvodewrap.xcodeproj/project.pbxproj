@@ -1,0 +1,76 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		5F17AE7D1A35AE50008F5B05 /* cvodewrap.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cvodewrap.c; path = ../cvodewrap.c; sourceTree = "<group>"; };
+		5F809A381A77F0900052ABC5 /* model_testsens.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = model_testsens.c; path = ../models/model_testsens/model_testsens.c; sourceTree = "<group>"; };
+		5F809A421A77F1410052ABC5 /* cvodewrapfunctions.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cvodewrapfunctions.c; path = ../models/model_testsens/cvodewrapfunctions.c; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		5F17AE761A35AE46008F5B05 = {
+			isa = PBXGroup;
+			children = (
+				5F809A421A77F1410052ABC5 /* cvodewrapfunctions.c */,
+				5F809A381A77F0900052ABC5 /* model_testsens.c */,
+				5F17AE7D1A35AE50008F5B05 /* cvodewrap.c */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		5F17AE771A35AE46008F5B05 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+			};
+			buildConfigurationList = 5F17AE7A1A35AE46008F5B05 /* Build configuration list for PBXProject "debug_cvodewrap" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 5F17AE761A35AE46008F5B05;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		5F17AE7B1A35AE46008F5B05 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		5F17AE7C1A35AE46008F5B05 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5F17AE7A1A35AE46008F5B05 /* Build configuration list for PBXProject "debug_cvodewrap" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F17AE7B1A35AE46008F5B05 /* Debug */,
+				5F17AE7C1A35AE46008F5B05 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5F17AE771A35AE46008F5B05 /* Project object */;
+}
