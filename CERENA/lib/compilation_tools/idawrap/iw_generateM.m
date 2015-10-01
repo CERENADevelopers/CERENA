@@ -126,7 +126,7 @@ fprintf(fid,'catch\n');
 fprintf(fid,'end\n');
 fprintf(fid,'\n');
 
-
+fprintf(fid,'ncount = 0;\n');
 fprintf(fid,['options_ida.sens_ind = 1:' num2str(np) ';\n']);
 fprintf(fid,['options_ida.idas_atol = ' num2str(struct.atol) ';\n']);
 fprintf(fid,['options_ida.idas_rtol = ' num2str(struct.atol) ';\n']);
@@ -144,7 +144,8 @@ fprintf(fid,['options_ida.dvddxNum = zeros(' num2str(nx) ',' num2str(nx) ');\n']
 fprintf(fid,['options_ida.dvduNum = zeros(' num2str(nx) ',' num2str(nu) ');\n']);
 fprintf(fid,['options_ida.dvdpNum = zeros(' num2str(nx) ',1);\n']);
 fprintf(fid,['options_ida.svNum = zeros(1,' num2str(nx) ');\n\n']);
-fprintf(fid,['options_ida.id = transpose([' num2str(transpose(struct.id)) ']);\n\n']);
+%fprintf(fid,['options_ida.id = transpose([' num2str(transpose(struct.id)) ']);\n\n']);
+fprintf(fid,['options_ida.id = transpose([' num2str(transpose(double(struct.id))) ']);\n\n']);
 fprintf(fid,['options_ida.sensi = 0;\n']);
 
 

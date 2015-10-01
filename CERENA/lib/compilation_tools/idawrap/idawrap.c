@@ -189,7 +189,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 sx_tmp = NV_DATA_S(sx[ip]);
                 memset(sx_tmp,0,sizeof(realtype)*nx);
             }
-            for (ip=0;ip<np;ip++) fsx0(ip, sx[ip], data);
+            for (ip=0;ip<np;ip++) fsx0(ip, sx[ip], x, dx, data);
             
             sdx = N_VCloneVectorArray_Serial(np, dx);
             if (sdx == NULL) goto error_return;
@@ -197,7 +197,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 sdx_tmp = NV_DATA_S(sdx[ip]);
                 memset(sdx_tmp,0,sizeof(realtype)*nx);
             }
-            for (ip=0;ip<np;ip++) fsdx0(ip, sdx[ip], data);
+            for (ip=0;ip<np;ip++) fsdx0(ip, sdx[ip], x, dx, data);
             
             
             fsv(data, tstart, x, dx);
@@ -323,6 +323,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 if(ts[it] > tstart) {
                     if(nx>0) {
                         status = IDAGetSens(ida_mem, &t, sx);
+                        if (status != IDA_SUCCESS) goto error_return;
+                        status = IDAGetSensDky(ida_mem, t, 1, sdx);
                         if (status != IDA_SUCCESS) goto error_return;
                     }
                 }

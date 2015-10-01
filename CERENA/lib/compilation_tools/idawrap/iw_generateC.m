@@ -326,7 +326,7 @@ fprintf(fid,'  return(0);\n');
 fprintf(fid,'}\n');
 fprintf(fid,'\n');
 fprintf(fid,'\n');
-fprintf(fid,[' void fsx0_' filename '(int ip, N_Vector sx0, void *user_data)\n']);
+fprintf(fid,[' void fsx0_' filename '(int ip, N_Vector sx0, N_Vector x, N_Vector dx, void *user_data)\n']);
 fprintf(fid,'{\n');
 fprintf(fid,'  UserData data = (UserData) user_data;\n');
 fprintf(fid,'  double *p = data->par;\n');
@@ -334,7 +334,9 @@ fprintf(fid,'  int *plist = data->plist;\n');
 fprintf(fid,'  double *k = data->k;\n');
 fprintf(fid,'  double *u = data->u;\n');
 fprintf(fid,'  double *sx0_tmp = N_VGetArrayPointer(sx0);\n');
-fprintf(fid,['  memset(sx0_tmp,0,sizeof(double)*' num2str(ny) ');\n']);
+fprintf(fid,'  double *x_tmp = N_VGetArrayPointer(x);\n');
+fprintf(fid,'  double *dx_tmp = N_VGetArrayPointer(dx);\n');
+fprintf(fid,['  memset(sx0_tmp,0,sizeof(double)*' num2str(nx) ');\n']);
 fprintf(fid,'  switch (plist[ip]) {\n');
 fprintf(fid,   writeCcode_sensi(struct, 'sensi0', filename));
 fprintf(fid,'  }\n');
@@ -343,7 +345,7 @@ fprintf(fid,'  return;\n');
 fprintf(fid,'}\n');
 fprintf(fid,'\n');
 fprintf(fid,'\n');
-fprintf(fid,[' void fsdx0_' filename '(int ip, N_Vector sdx0, void *user_data)\n']);
+fprintf(fid,[' void fsdx0_' filename '(int ip, N_Vector sdx0,  N_Vector x, N_Vector dx, void *user_data)\n']);
 fprintf(fid,'{\n');
 fprintf(fid,'  UserData data = (UserData) user_data;\n');
 fprintf(fid,'  double *p = data->par;\n');
@@ -351,7 +353,9 @@ fprintf(fid,'  int *plist = data->plist;\n');
 fprintf(fid,'  double *k = data->k;\n');
 fprintf(fid,'  double *u = data->u;\n');
 fprintf(fid,'  double *sdx0_tmp = N_VGetArrayPointer(sdx0);\n');
-fprintf(fid,['  memset(sdx0_tmp,0,sizeof(double)*' num2str(ny) ');\n']);
+fprintf(fid,'  double *x_tmp = N_VGetArrayPointer(x);\n');
+fprintf(fid,'  double *dx_tmp = N_VGetArrayPointer(dx);\n');
+fprintf(fid,['  memset(sdx0_tmp,0,sizeof(double)*' num2str(nx) ');\n']);
 fprintf(fid,'  switch (plist[ip]) {\n');
 fprintf(fid,   writeCcode_sensi(struct, 'sensid0', filename));
 fprintf(fid,'  }\n');
@@ -423,8 +427,8 @@ str_hfile = [...
 '             void fdx0_' filename '(N_Vector x0, N_Vector dx0, void *user_data);\n'...
 '             int DenseJacFn_' filename '(long int N, realtype t, realtype cj, N_Vector x, N_Vector dx, N_Vector F, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);\n'...
 '             int fsx_' filename '(int nps, realtype t, N_Vector x, N_Vector dx, N_Vector F, N_Vector *sx, N_Vector *sdx, N_Vector *sF, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);\n'...
-'             void fsx0_' filename '(int ip, N_Vector sx0, void *user_data);\n'...
-'             void fsdx0_' filename '(int ip, N_Vector sdx0, void *user_data);\n'...
+'             void fsx0_' filename '(int ip, N_Vector sx0, N_Vector x, N_Vector dx, void *user_data);\n'...
+'             void fsdx0_' filename '(int ip, N_Vector sdx0, N_Vector x, N_Vector dx, void *user_data);\n'...
 '             void fy_' filename '(double t, int nt, int it, double *y, double *p, double *k, double *u, double *x);\n'...
 '             void dfydp_' filename '(double t, int nt, int it, double *dydp, double *y, double *p, double *k, double *u, double *x, int *plist, int nps, int nobs);\n'...
 '             void dfydx_' filename '(double t, double *dydx, double *y, double *p, double *k, double *u, double *x);\n'...
@@ -474,13 +478,13 @@ str_funcfile = [...
                 '                    return IDADlsSetDenseJacFn(ida_mem, DenseJacFn_' filename ');\n'...
                 '                }\n'...
                 '                \n'...
-                '                void fsx0(int is, N_Vector sx_is, void *user_data){\n'...
+                '                void fsx0(int is, N_Vector sx_is, N_Vector x, N_Vector dx, void *user_data){\n'...
                 '                    UserData data = (UserData) user_data;\n'...
-                '                    fsx0_' filename '(is, sx_is, data);\n'...
+                '                    fsx0_' filename '(is, sx_is, x, dx, data);\n'...
                 '                }\n'...
-                '                void fsdx0(int is, N_Vector sdx_is, void *user_data){\n'...
+                '                void fsdx0(int is, N_Vector sdx_is, N_Vector x, N_Vector dx, void *user_data){\n'...
                 '                    UserData data = (UserData) user_data;\n'...
-                '                    fsdx0_' filename '(is, sdx_is, data);\n'...
+                '                    fsdx0_' filename '(is, sdx_is, x, dx, data);\n'...
                 '                }\n'...
                 '                \n'...
                 '                int idawrap_SensInit(void *ida_mem, int nps, int sensi_meth, N_Vector *sx, N_Vector *sdx){\n'...
@@ -520,7 +524,7 @@ str_funcfile = [...
                 '                }\n'...
                 '                \n'...
                 '                void fsy(double t, int nt, int it, int *plist, int nx, int ny, int nps, double *sy, double *p, double *k, double *u, double *x, double *su, double *sx){\n'...
-                '                    int ip;\n'...
+                '                    int ip;\n;'...
                 '                    for (ip=0; ip<nps; ip++) {\n'...
                 '                        fsy_' filename '(t, nt, it, plist[ip], ip,  nx, ny,  sy, p, k, u, x, su, sx);\n'...
                 '                    }\n'...
@@ -551,6 +555,14 @@ function [str] = writeCcode_sensi(struct,svar,filename)
                 cstr = [cstr...
                     '  case ' num2str(j2-1) ': {\n'...
                     writeCcode(struct,'fsx0', j2)...
+                    '\n'...
+                    '  } break;\n\n'];
+        end
+    elseif(strcmp(svar,'sensid0'))
+        for j2=1:size(struct.sym.fsdx0,2)
+                cstr = [cstr...
+                    '  case ' num2str(j2-1) ': {\n'...
+                    writeCcode(struct,'fsdx0', j2)...
                     '\n'...
                     '  } break;\n\n'];
         end
@@ -613,13 +625,18 @@ function [str] = writeCcode(struct, svar,ip)
             cstr = ccode(struct.sym.dfvdu(:));
             cvar =  'data->dvdu';
         else
-            cvar =  'data->u';
+            cvar =  'data->dvdu';
             cstr = char.empty(0,1);
         end
     elseif(strcmp(svar,'dvdp'))
-        cstr = ccode(struct.sym.dfvdp(:,ip));
-        cstr = [sprintf(['  memset(data->dvdp,0,sizeof(double)*' num2str(numel(struct.sym.dfvdp(:,ip))) ');\n']) cstr];
-        cvar =  'data->dvdp';
+        if(any(struct.sym.dfvdp(:,ip)~=0))
+            cstr = ccode(struct.sym.dfvdp(:,ip));
+            cstr = [sprintf(['  memset(data->dvdp,0,sizeof(double)*' num2str(numel(struct.sym.dfvdp(:,ip))) ');\n']) cstr];
+            cvar =  'data->dvdp';
+        else
+            cstr = char.empty(0,1);
+            cvar =  'data->dvdp';
+        end
     elseif(strcmp(svar,'fx'))
         cstr = ccode(struct.sym.fx(:));
         cstr = [sprintf(['  memset(F_tmp,0,sizeof(double)*' num2str(numel(struct.sym.fx(:))) ');\n']) cstr];
@@ -639,11 +656,21 @@ function [str] = writeCcode(struct, svar,ip)
         cstr = [sprintf(['  memset(sF_tmp,0,sizeof(double)*' num2str(numel(struct.sym.fsv(:,ip))) ');\n']) cstr];
         cvar =  'sF_tmp';
     elseif(strcmp(svar,'fsx0'))
-        cstr = ccode(struct.sym.fsx0(:,ip));
-        cvar =  'sx0_tmp';
+        if(any(struct.sym.fsx0(:,ip)~=0))
+            cstr = ccode(struct.sym.fsx0(:,ip));
+            cvar =  'sx0_tmp';
+        else
+            cstr = char.empty(0,1);
+            cvar =  'sx0_tmp';
+        end
     elseif(strcmp(svar,'fsdx0'))
-        cstr = ccode(struct.sym.fsdx0(:,ip));
-        cvar =  'sdx0_tmp';
+        if(any(struct.sym.fsdx0(:,ip)~=0))
+            cstr = ccode(struct.sym.fsdx0(:,ip));
+            cvar =  'sdx0_tmp';
+        else
+            cstr = char.empty(0,1);
+            cvar =  'sdx0_tmp';
+        end
     elseif(strcmp(svar,'fu'))
         if(~isempty(struct.sym.fu(:)))
             cstr = ccode(struct.sym.fu(:));
@@ -674,19 +701,33 @@ function [str] = writeCcode(struct, svar,ip)
         cstr = ccode(struct.sym.mudot(:));
         cvar =  'xBdot_tmp';
     elseif(strcmp(svar,'fxQB'))
-        cstr = ccode(struct.sym.int(:,ip));
-        cvar =  'qBdot_tmp';
+        if(any(struct.sym.int(:,ip)~=0))
+            cstr = ccode(struct.sym.int(:,ip));
+            cvar =  'qBdot_tmp';
+        else
+            cstr = char.empty(0,1);
+            cvar =  'qBdot_tmp';
+        end
     elseif(strcmp(svar,'dydp'))
-        cstr = ccode(struct.sym.dfydp(:,ip));
-        cvar =  'dydp';
+        if(any(struct.sym.dfydp(:,ip)~=0))
+            cstr = ccode(struct.sym.dfydp(:,ip));
+            cvar =  'dydp';
+        else
+            cstr = char.empty(0,1);
+            cvar =  'dydp';
+        end
     end
     cstr = strrep(cstr, 't0', [cvar '[0]']);
     cstr = strrep(cstr, '][0]', ']');
     cstr = strrep(cstr, 'T', cvar);
     if(strcmp(cvar,'qBdot_tmp'))
-        cstr = regexprep(cstr,'qBdot_tmp\[([0-9]*)\]','qBdot_tmp\[$1+ip*nobs]');
+        if(~isempty(cstr))
+            cstr = regexprep(cstr,'qBdot_tmp\[([0-9]*)\]','qBdot_tmp\[$1+ip*nobs]');
+        end
     elseif(strcmp(cvar,'dydp'))
-        cstr = regexprep(cstr,'dydp\[([0-9]*)\]','dydp\[it + nt*($1+ip*nobs)]');
+        if(~isempty(cstr))
+            cstr = regexprep(cstr,'dydp\[([0-9]*)\]','dydp\[it + nt*($1+ip*nobs)]');
+        end
     end
     
     if(~(length(cstr)==1 && isempty(cstr{1})))

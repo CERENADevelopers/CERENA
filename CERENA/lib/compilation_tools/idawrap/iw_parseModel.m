@@ -117,35 +117,38 @@ function [struct] = iw_parseModel(struct)
     
     % replace syms by strsyms
     struct.sym.f = mysubs(struct.sym.f,struct.sym.x,strsym.xs);
-    struct.sym.M = mysubs(struct.sym.M,struct.sym.x,strsym.xs);
     struct.sym.y = mysubs(struct.sym.y,struct.sym.x,strsym.xs);
+    struct.sym.M = mysubs(struct.sym.M,struct.sym.x,strsym.xs);
     struct.sym.dx0 = mysubs(struct.sym.dx0,struct.sym.x,strsym.xs);
 
     struct.sym.f = mysubs(struct.sym.f,struct.sym.p,strsym.ps);
-    struct.sym.M = mysubs(struct.sym.M,struct.sym.p,strsym.ps);
     struct.sym.y = mysubs(struct.sym.y,struct.sym.p,strsym.ps);
     struct.sym.x0 = mysubs(struct.sym.x0,struct.sym.p,strsym.ps);
     struct.sym.dx0 = mysubs(struct.sym.dx0,struct.sym.p,strsym.ps);
+    struct.sym.M = mysubs(struct.sym.M,struct.sym.p,strsym.ps);
     struct.sym.u = mysubs(struct.sym.u,struct.sym.p,strsym.ps);
 
     struct.sym.f = mysubs(struct.sym.f,struct.sym.k,strsym.ks);
-    struct.sym.M = mysubs(struct.sym.M,struct.sym.k,strsym.ks);
     struct.sym.y = mysubs(struct.sym.y,struct.sym.k,strsym.ks);
     struct.sym.x0 = mysubs(struct.sym.x0,struct.sym.k,strsym.ks);
     struct.sym.dx0 = mysubs(struct.sym.dx0,struct.sym.k,strsym.ks);
+    struct.sym.M = mysubs(struct.sym.M,struct.sym.k,strsym.ks);
     struct.sym.u = mysubs(struct.sym.u,struct.sym.k,strsym.ks);
 
     struct.sym.f = mysubs(struct.sym.f,struct.sym.u,strsym.us);
-    struct.sym.M = mysubs(struct.sym.M,struct.sym.u,strsym.us);
     struct.sym.y = mysubs(struct.sym.y,struct.sym.u,strsym.us);
     struct.sym.x0 = mysubs(struct.sym.x0,struct.sym.u,strsym.us);
     struct.sym.dx0 = mysubs(struct.sym.dx0,struct.sym.u,strsym.us);
+    struct.sym.M = mysubs(struct.sym.M,struct.sym.u,strsym.us);
 
 
 
     % compute rhs
-    struct.sym.f = transpose(struct.sym.f);
-    struct.sym.f = simplify(-struct.sym.M*strsym.dxs+struct.sym.f);
+    if(size(struct.sym.f,2)>size(struct.sym.f,1))
+        struct.sym.f = simplify(-transpose(struct.sym.M*strsym.dxs)+struct.sym.f);
+    else
+        struct.sym.f = simplify(-struct.sym.M*strsym.dxs+struct.sym.f);
+    end
     
     % compute derivatives
     struct.sym.dfvdx=simplify(jacobian(struct.sym.f,strsym.xs));
@@ -300,10 +303,7 @@ function [struct] = iw_parseModel(struct)
         struct.sym.dfxdp=strsym.dvdp ;
     end
     
-    struct.id = zeros(size(struct.sym.M,1),1);
-    for j = 1:size(struct.sym.M,1)
-        struct.id(j) = ~isequaln(sum(struct.sym.M(j,:)),sym(0));
-    end
+    struct.id = sum(struct.sym.M,2)~=0;
     
     % adjoint sensitivities
     

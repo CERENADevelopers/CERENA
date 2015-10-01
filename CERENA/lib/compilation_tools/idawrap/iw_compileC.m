@@ -106,5 +106,5 @@ if(~exist(['models/' mexext '/' objects{j}], 'file'))
     eval(['mex -c -outdir models/' mexext '/' includesstr ' ' filename '/' filename  '.c']);
 end
 
-eval(['mex  -output ' odewrap_path 'models/' filename '/' filename ' ' odewrap_path 'idawrap.c '  includesstr objectsstr ])
+eval(['mex -output ' odewrap_path 'models/' filename '/' filename ' ' odewrap_path 'idawrap.c '  includesstr objectsstr ])
 %eval(['mex -output ' odewrap_path 'models/' filename '/' filename '_ASA ' odewrap_path 'idawrap_ASA.c '  includesstr objectsstr ])
