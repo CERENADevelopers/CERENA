@@ -159,9 +159,11 @@ if(any([strcmp(expansion,'RRE'),strcmp(expansion,'EMRE'),strcmp(expansion,'LNA')
     eval(modelfile);
     switch System.scaleIndicator
         case 'microscopic'
-            System.scaleConversion = 'Micro_to_Macro';
-        case 'macroscopic'
+%             System.scaleConversion = 'Micro_to_Macro';
             System.scaleConversion = 'None';
+        case 'macroscopic'
+%             System.scaleConversion = 'None';
+            System.scaleConversion = 'Macro_to_Micro';
     end
     System = completeSystem(System);
     System.name = expansion;

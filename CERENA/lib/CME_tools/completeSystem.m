@@ -1,137 +1,137 @@
-function system = completeSystem(system)
-tmpsize = size(system.compartments);
+function System = completeSystem(System)
+tmpsize = size(System.compartments);
 if tmpsize(1)==1
-    system.compartments = transpose(system.compartments);
+    System.compartments = transpose(System.compartments);
 end
-tmpsize = size(system.volumes);
+tmpsize = size(System.volumes);
 if tmpsize(1)==1
-    system.volumes = transpose(system.volumes);
+    System.volumes = transpose(System.volumes);
 end
 %% STOICHIOMETRY
-if isfield(system,'state')
-    system.state.number   = length(system.state.variable);
+if isfield(System,'state')
+    System.state.number   = length(System.state.variable);
     % converting to column vector
-    tmpsize = size(system.state.variable);
+    tmpsize = size(System.state.variable);
     if tmpsize(1)==1
-        system.state.variable = transpose(system.state.variable);
+        System.state.variable = transpose(System.state.variable);
     end
-    tmpsize = size(system.state.compartment);
+    tmpsize = size(System.state.compartment);
     if tmpsize(1)==1
-        system.state.compartment = transpose(system.state.compartment);
+        System.state.compartment = transpose(System.state.compartment);
     end
-    if isfield(system.state,'xmin')
-        tmpsize = size(system.state.xmin);
+    if isfield(System.state,'xmin')
+        tmpsize = size(System.state.xmin);
         if tmpsize(1)==1
-            system.state.xmin = transpose(system.state.xmin);
+            System.state.xmin = transpose(System.state.xmin);
         end
     end
-    if isfield(system.state,'xmax')
-        tmpsize = size(system.state.xmax);
+    if isfield(System.state,'xmax')
+        tmpsize = size(System.state.xmax);
         if tmpsize(1)==1
-            system.state.xmax = transpose(system.state.xmax);
+            System.state.xmax = transpose(System.state.xmax);
         end
     end
-    tmpsize = size(system.state.mu0);
+    tmpsize = size(System.state.mu0);
     if tmpsize(1)==1
-        system.state.mu0 = transpose(system.state.mu0);
+        System.state.mu0 = transpose(System.state.mu0);
     end
     %% Initial Conditions
-    system.state.mu0 = sym(system.state.mu0);
+    System.state.mu0 = sym(System.state.mu0);
     % Initial conditions for (co)variances
-    if ~isfield(system.state,'C0')
-        system.state.C0 = sym(zeros(system.state.number*(system.state.number+1)/2,1));
+    if ~isfield(System.state,'C0')
+        System.state.C0 = sym(zeros(System.state.number*(System.state.number+1)/2,1));
     else
-        system.state.C0 = sym(system.state.C0);
-        tmpsize = size(system.state.C0);
+        System.state.C0 = sym(System.state.C0);
+        tmpsize = size(System.state.C0);
         if tmpsize(1)==1
-            system.state.C0 = transpose(system.state.C0);
+            System.state.C0 = transpose(System.state.C0);
         end
     end
-    if isfield(system,'kappa')
-        kappa = system.kappa.variable;
+    if isfield(System,'kappa')
+        kappa = System.kappa.variable;
     else
         kappa = [];
     end
     % Length of the kappa provided by the user
     nk1 = length(kappa);
     % Adding indicators for initial conditions of mu0 to kappa
-    kmu0_ind = sym('indmu',[length(system.state.mu0),1]);
+    kmu0_ind = sym('indmu',[length(System.state.mu0),1]);
     % Adding initial conditions of mu0 to kappa
-    kmu0_sym = sym('kmu0',[length(system.state.mu0),1]);
+    kmu0_sym = sym('kmu0',[length(System.state.mu0),1]);
     % Adding indicators for initial conditions of C0 to kappa
-    kC0_ind = sym('indC',[length(system.state.C0),1]);
+    kC0_ind = sym('indC',[length(System.state.C0),1]);
     % Adding initial conditions of C0 to kappa
-    kC0_sym = sym('kC0',[length(system.state.C0),1]);
+    kC0_sym = sym('kC0',[length(System.state.C0),1]);
     % Adding all to kappa
     kappa = [kappa;kmu0_ind;kC0_ind;kmu0_sym;kC0_sym];
-    system.kappa.variable = kappa;
-    system.kappa.nk1 = nk1;
+    System.kappa.variable = kappa;
+    System.kappa.nk1 = nk1;
     
     % Symbolic array for the prespecified initial conditions of mu0 in the
     % modelDef
-    fmu0_sym = sym('fmu0',[length(system.state.mu0),1]);
+    fmu0_sym = sym('fmu0',[length(System.state.mu0),1]);
     % Symbolic array for the prespecified initial conditions of C0 in the
     % modelDef
-    fC0_sym = sym('fC0',[length(system.state.C0),1]);
+    fC0_sym = sym('fC0',[length(System.state.C0),1]);
     
     % Saving the initial conditions prespecified in the modelDef
-    system.state.fmu0 = system.state.mu0;
-    system.state.fC0 = system.state.C0;
-    system.state.fmu0_sym = fmu0_sym;
-    system.state.fC0_sym = fC0_sym;
+    System.state.fmu0 = System.state.mu0;
+    System.state.fC0 = System.state.C0;
+    System.state.fmu0_sym = fmu0_sym;
+    System.state.fC0_sym = fC0_sym;
     
-    system.state.mu0 = kmu0_ind .* kmu0_sym + (1 - kmu0_ind).* fmu0_sym;
-    system.state.C0 = kC0_ind .* kC0_sym + (1 - kC0_ind).* fC0_sym;
+    System.state.mu0 = kmu0_ind .* kmu0_sym + (1 - kmu0_ind).* fmu0_sym;
+    System.state.C0 = kC0_ind .* kC0_sym + (1 - kC0_ind).* fC0_sym;
     
     %%%%%%% Other fields
-    system.state.volume = sym(zeros(length(system.state.variable),1));
-    for i = 1:system.state.number
-        indComp = find(strcmp(system.compartments,system.state.compartment(i)));
-        system.state.volume(i) = system.volumes(indComp);
+    System.state.volume = sym(zeros(length(System.state.variable),1));
+    for i = 1:System.state.number
+        indComp = find(strcmp(System.compartments,System.state.compartment(i)));
+        System.state.volume(i) = System.volumes(indComp);
     end
     % Default naming of species
-    if ~isfield(system.state,'name')
-        for i =1:system.state.number
-            system.state.name{i,1} = char(system.state.variable(i));
+    if ~isfield(System.state,'name')
+        for i =1:System.state.number
+            System.state.name{i,1} = char(System.state.variable(i));
         end
     end
     % Default type of species
-    if ~isfield(system.state,'type')
-        system.state.type = repmat({'moment'},[system.state.number,1]);
+    if ~isfield(System.state,'type')
+        System.state.type = repmat({'moment'},[System.state.number,1]);
     end
 end
 
-if isfield(system,'parameter')
-    tmpsize = size(system.parameter.variable);
+if isfield(System,'parameter')
+    tmpsize = size(System.parameter.variable);
     if tmpsize(1)==1
-        system.parameter.variable = transpose(system.parameter.variable);
+        System.parameter.variable = transpose(System.parameter.variable);
     end
-    if ~isfield(system.parameter,'name')
-        for i =1:length(system.parameter.variable)
-            system.parameter.name{i,1} = char(system.parameter.variable(i));
+    if ~isfield(System.parameter,'name')
+        for i =1:length(System.parameter.variable)
+            System.parameter.name{i,1} = char(System.parameter.variable(i));
         end
     else
-        tmpsize = size(system.parameter.name);
+        tmpsize = size(System.parameter.name);
         if tmpsize(1)==1
-            system.parameter.name = transpose(system.parameter.name);
+            System.parameter.name = transpose(System.parameter.name);
         end
     end
 end
 
 % Constant parameters
-if isfield(system,'kappa')
-    tmpsize = size(system.kappa.variable);
+if isfield(System,'kappa')
+    tmpsize = size(System.kappa.variable);
     if tmpsize(1)==1
-        system.kappa.variable = transpose(system.kappa.variable);
+        System.kappa.variable = transpose(System.kappa.variable);
     end
-    if ~isfield(system.kappa,'name')
-        for i =1:length(system.kappa.variable)
-            system.kappa.name{i,1} = char(system.kappa.variable(i));
+    if ~isfield(System.kappa,'name')
+        for i =1:length(System.kappa.variable)
+            System.kappa.name{i,1} = char(System.kappa.variable(i));
         end
     else
-        tmpsize = size(system.kappa.name);
+        tmpsize = size(System.kappa.name);
         if tmpsize(1)==1
-            system.kappa.name = transpose(system.kappa.name);
+            System.kappa.name = transpose(System.kappa.name);
         end
     end
 end
@@ -139,127 +139,135 @@ end
 %     system.parameter.MicroscopicValue = system.parameter.MacroscopicValue;
 % end
 % Loop: reactions
-if isfield(system,'reaction')
-    S_e = zeros(length(system.state.variable),length(system.reaction));
-    S_p = zeros(length(system.state.variable),length(system.reaction));
-    for k = 1:length(system.reaction)
+if isfield(System,'reaction')
+    S_e = zeros(length(System.state.variable),length(System.reaction));
+    S_p = zeros(length(System.state.variable),length(System.reaction));
+    for k = 1:length(System.reaction)
         % Educt
-        for j = 1:length(system.reaction(k).educt)
-            ind = find(system.state.variable == system.reaction(k).educt(j));
+        for j = 1:length(System.reaction(k).educt)
+            ind = find(System.state.variable == System.reaction(k).educt(j));
             S_e(ind,k) = S_e(ind,k) + 1;
         end
         
         % Product
-        for j = 1:length(system.reaction(k).product)
-            ind = find(system.state.variable == system.reaction(k).product(j));
+        for j = 1:length(System.reaction(k).product)
+            ind = find(System.state.variable == System.reaction(k).product(j));
             S_p(ind,k) = S_p(ind,k) + 1;
         end
         
         % Stoichiometry
-        system.reaction(k).stoichiometry = S_p(:,k)-S_e(:,k);
-        symvarReac = symvar(system.reaction(k).propensity);
-        ind = ismember(symvarReac,system.parameter.variable);
-        system.reaction(k).parameter = symvarReac(ind);
+        System.reaction(k).stoichiometry = S_p(:,k)-S_e(:,k);
+        symvarReac = symvar(System.reaction(k).propensity);
+        ind = ismember(symvarReac,System.parameter.variable);
+        System.reaction(k).parameter = symvarReac(ind);
     end
     %% Derivation of rate frommicro/macro propensities
-    if isfield(system,'scaleIndicator')
-        switch system.scaleIndicator
-            case 'microscopic'
-                for k = 1:length(system.reaction)
-                    if any(S_e(:,k)>1)
-                        tmpRate = coeffs(system.reaction(k).propensity,symvar(system.reaction(k).educt));
-                        tmpInd = S_e(S_e(:,k)>1,k);
-                        system.reaction(k).rate = tmpRate(end)*prod(factorial(tmpInd));
-                    else
-                        system.reaction(k).rate = coeffs(system.reaction(k).propensity,symvar(system.reaction(k).educt));
-                    end
-                end
-            case 'macroscopic'
-                for k = 1:length(system.reaction)
-                    system.reaction(k).rate = coeffs(system.reaction(k).propensity,symvar(system.reaction(k).educt));
-                end
-        end
-    end
+%     if isfield(System,'scaleIndicator')
+%         switch System.scaleIndicator
+%             case 'microscopic'
+%                 for k = 1:length(System.reaction)
+%                     if any(S_e(:,k)>1)
+%                         tmpRate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
+%                         tmpInd = S_e(S_e(:,k)>1,k);
+%                         System.reaction(k).rate = tmpRate(end)*prod(factorial(tmpInd));
+%                     else
+%                         System.reaction(k).rate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
+%                     end
+%                 end
+%             case 'macroscopic'
+%                 for k = 1:length(System.reaction)
+%                     System.reaction(k).rate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
+%                 end
+%         end
+%     end
     %% Microscopic and Macroscopic interconversion
-    if isfield(system,'scaleConversion')
-        switch system.scaleConversion
+    if isfield(System,'scaleConversion')
+        switch System.scaleConversion
             case 'Micro_to_Macro'
-                for k = 1:length(system.reaction)
+                for k = 1:length(System.reaction)
                     if any(S_e(:,k)>1)
-                        system.reaction(k).propensity = system.reaction(k).rate * prod(system.reaction(k).educt);
+                        System.reaction(k).propensity = System.reaction(k).rate * prod(System.reaction(k).educt);
                     end
                     indEduc = find(S_e(:,k)>0);
-                    tmpProp = system.reaction(k).propensity;
-                    tmpProp = subs(tmpProp,system.state.variable,system.state.variable.*system.state.volume);
-                    system.reaction(k).propensity = tmpProp/system.state.volume(indEduc(1));
+                    tmpProp = System.reaction(k).propensity;
+                    tmpProp = subs(tmpProp,System.state.variable,System.state.variable.*System.state.volume);
+                    System.reaction(k).propensity = tmpProp/System.state.volume(indEduc(1));
+                    System.reaction(k).rate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
                 end
             case 'Macro_to_Micro'
-                for k = 1:length(system.reaction)
+                for k = 1:length(System.reaction)
                     indEduc = find(S_e(:,k)>0);
                     if any(S_e(:,k)>1)
-                        tmpProp = system.reaction(k).propensity;
-                        tmpProp = subs(tmpProp,system.state.variable,system.state.variable./system.state.volume);
-                        system.reaction(k).propensity = tmpProp * system.state.volume(indEduc(1));
-                        system.reaction(k).propensity = simplify(system.reaction(k).propensity);
-                        tmpProp = coeffs(system.reaction(k).propensity,symvar(system.reaction(k).educt));
+                        tmpProp = System.reaction(k).propensity;
+                        tmpProp = subs(tmpProp,System.state.variable,System.state.variable./System.state.volume);
+                        System.reaction(k).propensity = tmpProp * System.state.volume(indEduc(1));
+                        System.reaction(k).propensity = simplify(System.reaction(k).propensity);
+                        tmpProp = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
+                        System.reaction(k).rate = tmpProp;
                         %                         tmpProp = system.reaction(k).rate;
                         for iEduc = indEduc
-                            tmpProp = tmpProp * expand(nchoosek(system.state.variable(iEduc),S_e(iEduc,k)));
+                            tmpProp = tmpProp * expand(nchoosek(System.state.variable(iEduc),S_e(iEduc,k)));
                         end
-                        system.reaction(k).propensity = tmpProp;
+                        System.reaction(k).propensity = tmpProp;
                     else
-                        tmpProp = system.reaction(k).propensity;
-                        tmpProp = subs(tmpProp,system.state.variable,system.state.variable./system.state.volume);
-                        system.reaction(k).propensity = tmpProp * system.state.volume(indEduc(1));
+                        tmpProp = System.reaction(k).propensity;
+                        tmpProp = subs(tmpProp,System.state.variable,System.state.variable./System.state.volume);
+                        if ~isempty(indEduc)
+                            System.reaction(k).propensity = tmpProp * System.state.volume(indEduc(1));
+                        else
+                            indProd = find(S_p(:,k)>0);
+                            System.reaction(k).propensity = tmpProp * System.state.volume(indProd(1));
+                        end
+                        System.reaction(k).rate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
                     end
                 end
         end
     end
     
-    system.eductStoichiometry = S_e;
-    system.productStoichiometry = S_p;
-    system.stoichiometry = S_p - S_e;
+    System.eductStoichiometry = S_e;
+    System.productStoichiometry = S_p;
+    System.stoichiometry = S_p - S_e;
 end
 
-if isfield(system,'output')
-    system.output.number   = length(system.output.variable);
-    tmpsize = size(system.output.variable);
+if isfield(System,'output')
+    System.output.number   = length(System.output.variable);
+    tmpsize = size(System.output.variable);
     if tmpsize(1)==1
-        system.output.variable = transpose(system.output.variable);
+        System.output.variable = transpose(System.output.variable);
     end
-    tmpsize = size(system.output.function);
+    tmpsize = size(System.output.function);
     if tmpsize(1)==1
-        system.output.function = transpose(system.output.function);
+        System.output.function = transpose(System.output.function);
     end
-    if ~isfield(system.output,'name')
-        for i =1:system.output.number
-            system.output.name{i,1} = char(system.output.variable(i));
+    if ~isfield(System.output,'name')
+        for i =1:System.output.number
+            System.output.name{i,1} = char(System.output.variable(i));
         end
     else
-        tmpsize = size(system.output.name);
+        tmpsize = size(System.output.name);
         if tmpsize(1)==1
-            system.output.name = transpose(system.output.name);
+            System.output.name = transpose(System.output.name);
         end
     end
 end
-if isfield(system,'input')
-    system.input.number   = length(system.input.variable);
-    tmpsize = size(system.input.variable);
+if isfield(System,'input')
+    System.input.number   = length(System.input.variable);
+    tmpsize = size(System.input.variable);
     if tmpsize(1)==1
-        system.input.variable = transpose(system.input.variable);
+        System.input.variable = transpose(System.input.variable);
     end
-    tmpsize = size(system.input.function);
+    tmpsize = size(System.input.function);
     if tmpsize(1)<tmpsize(2)
-        system.input.function = transpose(system.input.function);
+        System.input.function = transpose(System.input.function);
     end
-    if ~isfield(system.input,'name')
-        for i =1:system.input.number
-            system.input.name{i,1} = char(system.input.variable(i));
+    if ~isfield(System.input,'name')
+        for i =1:System.input.number
+            System.input.name{i,1} = char(System.input.variable(i));
         end
     else
-        tmpsize = size(system.input.name);
+        tmpsize = size(System.input.name);
         if tmpsize(1)==1
-            system.input.name = transpose(system.input.name);
+            System.input.name = transpose(System.input.name);
         end
     end
 end
