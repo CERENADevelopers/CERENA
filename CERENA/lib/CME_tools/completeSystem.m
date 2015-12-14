@@ -1,4 +1,14 @@
-function System = completeSystem(System)
+%function System = completeSystem(System)
+function System = completeSystem(varargin)
+if nargin >= 1
+    System = varargin{1};
+else
+    error('At least one input argument is required!')
+end
+options.sym_kappa = true;
+if nargin >= 2
+    options = setdefault(varargin{2},options);
+end
 tmpsize = size(System.compartments);
 if tmpsize(1)==1
     System.compartments = transpose(System.compartments);
@@ -54,34 +64,43 @@ if isfield(System,'state')
     end
     % Length of the kappa provided by the user
     nk1 = length(kappa);
-    % Adding indicators for initial conditions of mu0 to kappa
-    kmu0_ind = sym('indmu',[length(System.state.mu0),1]);
-    % Adding initial conditions of mu0 to kappa
-    kmu0_sym = sym('kmu0',[length(System.state.mu0),1]);
-    % Adding indicators for initial conditions of C0 to kappa
-    kC0_ind = sym('indC',[length(System.state.C0),1]);
-    % Adding initial conditions of C0 to kappa
-    kC0_sym = sym('kC0',[length(System.state.C0),1]);
-    % Adding all to kappa
-    kappa = [kappa;kmu0_ind;kC0_ind;kmu0_sym;kC0_sym];
+    if options.sym_kappa
+        % Adding indicators for initial conditions of mu0 to kappa
+        kmu0_ind = sym('indmu',[length(System.state.mu0),1]);
+        % Adding initial conditions of mu0 to kappa
+        kmu0_sym = sym('kmu0',[length(System.state.mu0),1]);
+        % Adding indicators for initial conditions of C0 to kappa
+        kC0_ind = sym('indC',[length(System.state.C0),1]);
+        % Adding initial conditions of C0 to kappa
+        kC0_sym = sym('kC0',[length(System.state.C0),1]);
+        % Adding all to kappa
+        kappa = [kappa;kmu0_ind;kC0_ind;kmu0_sym;kC0_sym];
+    end
     System.kappa.variable = kappa;
     System.kappa.nk1 = nk1;
     
-    % Symbolic array for the prespecified initial conditions of mu0 in the
-    % modelDef
-    fmu0_sym = sym('fmu0',[length(System.state.mu0),1]);
-    % Symbolic array for the prespecified initial conditions of C0 in the
-    % modelDef
-    fC0_sym = sym('fC0',[length(System.state.C0),1]);
-    
-    % Saving the initial conditions prespecified in the modelDef
-    System.state.fmu0 = System.state.mu0;
-    System.state.fC0 = System.state.C0;
-    System.state.fmu0_sym = fmu0_sym;
-    System.state.fC0_sym = fC0_sym;
-    
-    System.state.mu0 = kmu0_ind .* kmu0_sym + (1 - kmu0_ind).* fmu0_sym;
-    System.state.C0 = kC0_ind .* kC0_sym + (1 - kC0_ind).* fC0_sym;
+    if options.sym_kappa
+        % Symbolic array for the prespecified initial conditions of mu0 in the
+        % modelDef
+        fmu0_sym = sym('fmu0',[length(System.state.mu0),1]);
+        % Symbolic array for the prespecified initial conditions of C0 in the
+        % modelDef
+        fC0_sym = sym('fC0',[length(System.state.C0),1]);
+        
+        % Saving the initial conditions prespecified in the modelDef
+        System.state.fmu0 = System.state.mu0;
+        System.state.fC0 = System.state.C0;
+        System.state.fmu0_sym = fmu0_sym;
+        System.state.fC0_sym = fC0_sym;
+        
+        System.state.mu0 = kmu0_ind .* kmu0_sym + (1 - kmu0_ind).* fmu0_sym;
+        System.state.C0 = kC0_ind .* kC0_sym + (1 - kC0_ind).* fC0_sym;
+    else
+        System.state.fmu0 = [];
+        System.state.fC0 = [];
+        System.state.fmu0_sym = [];
+        System.state.fC0_sym = [];    
+    end
     
     %%%%%%% Other fields
     System.state.volume = sym(zeros(length(System.state.variable),1));
@@ -161,26 +180,69 @@ if isfield(System,'reaction')
         ind = ismember(symvarReac,System.parameter.variable);
         System.reaction(k).parameter = symvarReac(ind);
     end
-    %% Derivation of rate frommicro/macro propensities
-%     if isfield(System,'scaleIndicator')
-%         switch System.scaleIndicator
-%             case 'microscopic'
+    %% Derivation of rate for micro/macro propensities
+    if isfield(System,'scaleIndicator')
+        switch System.scaleIndicator
+            case 'microscopic'
+                for k = 1:length(System.reaction)
+                    if any(S_e(:,k)>1)
+                        tmpRate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
+                        tmpInd = S_e(S_e(:,k)>1,k);
+                        System.reaction(k).rate = tmpRate(end)*prod(factorial(tmpInd));
+                    else
+                        System.reaction(k).rate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
+                    end
+                end
+            case 'macroscopic'
+                for k = 1:length(System.reaction)
+                    System.reaction(k).rate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
+                end
+        end
+    end
+    %% Microscopic and Macroscopic interconversion
+%     if isfield(System,'scaleConversion')
+%         switch System.scaleConversion
+%             case 'Micro_to_Macro'
 %                 for k = 1:length(System.reaction)
 %                     if any(S_e(:,k)>1)
-%                         tmpRate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
-%                         tmpInd = S_e(S_e(:,k)>1,k);
-%                         System.reaction(k).rate = tmpRate(end)*prod(factorial(tmpInd));
+%                         System.reaction(k).propensity = System.reaction(k).rate * prod(System.reaction(k).educt);
+%                     end
+%                     indEduc = find(S_e(:,k)>0);
+%                     tmpProp = System.reaction(k).propensity;
+%                     tmpProp = subs(tmpProp,System.state.variable,System.state.variable.*System.state.volume);
+%                     System.reaction(k).propensity = tmpProp/System.state.volume(indEduc(1));
+%                     System.reaction(k).rate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
+%                 end
+%             case 'Macro_to_Micro'
+%                 for k = 1:length(System.reaction)
+%                     indEduc = find(S_e(:,k)>0);
+%                     if any(S_e(:,k)>1)
+%                         tmpProp = System.reaction(k).propensity;
+%                         tmpProp = subs(tmpProp,System.state.variable,System.state.variable./System.state.volume);
+%                         System.reaction(k).propensity = tmpProp * System.state.volume(indEduc(1));
+%                         System.reaction(k).propensity = simplify(System.reaction(k).propensity);
+%                         tmpProp = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
+%                         System.reaction(k).rate = tmpProp;
+%                         %                         tmpProp = system.reaction(k).rate;
+%                         for iEduc = indEduc
+%                             tmpProp = tmpProp * expand(nchoosek(System.state.variable(iEduc),S_e(iEduc,k)));
+%                         end
+%                         System.reaction(k).propensity = tmpProp;
 %                     else
+%                         tmpProp = System.reaction(k).propensity;
+%                         tmpProp = subs(tmpProp,System.state.variable,System.state.variable./System.state.volume);
+%                         if ~isempty(indEduc)
+%                             System.reaction(k).propensity = tmpProp * System.state.volume(indEduc(1));
+%                         else
+%                             indProd = find(S_p(:,k)>0);
+%                             System.reaction(k).propensity = tmpProp * System.state.volume(indProd(1));
+%                         end
 %                         System.reaction(k).rate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
 %                     end
 %                 end
-%             case 'macroscopic'
-%                 for k = 1:length(System.reaction)
-%                     System.reaction(k).rate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
-%                 end
 %         end
 %     end
-    %% Microscopic and Macroscopic interconversion
+    %% More general - not assuming mass action on the reactants
     if isfield(System,'scaleConversion')
         switch System.scaleConversion
             case 'Micro_to_Macro'
@@ -196,30 +258,21 @@ if isfield(System,'reaction')
                 end
             case 'Macro_to_Micro'
                 for k = 1:length(System.reaction)
+                    tmpProp = System.reaction(k).propensity;
+                    svtmpProp = symvar(tmpProp);
+                    indsv = ismember(svtmpProp,System.state.variable);
+                    svstate = svtmpProp(indsv);
+                    if ~isempty(svstate)
+                        tmpProp = subs(tmpProp,svstate.^2,svstate.*(svstate-1)/2);
+                    end
                     indEduc = find(S_e(:,k)>0);
-                    if any(S_e(:,k)>1)
-                        tmpProp = System.reaction(k).propensity;
-                        tmpProp = subs(tmpProp,System.state.variable,System.state.variable./System.state.volume);
-                        System.reaction(k).propensity = tmpProp * System.state.volume(indEduc(1));
-                        System.reaction(k).propensity = simplify(System.reaction(k).propensity);
-                        tmpProp = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
-                        System.reaction(k).rate = tmpProp;
-                        %                         tmpProp = system.reaction(k).rate;
-                        for iEduc = indEduc
-                            tmpProp = tmpProp * expand(nchoosek(System.state.variable(iEduc),S_e(iEduc,k)));
-                        end
-                        System.reaction(k).propensity = tmpProp;
-                    else
-                        tmpProp = System.reaction(k).propensity;
-                        tmpProp = subs(tmpProp,System.state.variable,System.state.variable./System.state.volume);
+                    tmpProp = subs(tmpProp,System.state.variable,System.state.variable./System.state.volume);
                         if ~isempty(indEduc)
                             System.reaction(k).propensity = tmpProp * System.state.volume(indEduc(1));
                         else
                             indProd = find(S_p(:,k)>0);
                             System.reaction(k).propensity = tmpProp * System.state.volume(indProd(1));
                         end
-                        System.reaction(k).rate = coeffs(System.reaction(k).propensity,symvar(System.reaction(k).educt));
-                    end
                 end
         end
     end
