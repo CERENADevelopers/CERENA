@@ -220,103 +220,134 @@ if isfield(system,'output')
     var_system = [var_system;var_output];
 end
 hoM_used = transpose(setdiff(symvar(dMdt),var_system));
-hoM_closure = sym([]);
+ind_hoM_used = 1:length(hoM_used);
+% hoM_closure2 = sym([]);
+hoM_closure = sym(zeros(size(hoM_used)));
 if ~isempty(hoM_used)
     disp('Moment-closure used!')
-    if strcmp(options.moment_closure,'low-dispersion')
-        hoM_closure = sym(zeros(size(hoM_used)));
-    elseif strcmp(options.moment_closure,'log-normal')
-        if options.moment_order >= 2
-            var_ind  = covar_ind(covar_ind(:,end-1)==covar_ind(:,end),:);
-            epsilon = 1e-6;
-            munorm = log(epsilon + mu.^2./sqrt(mu.^2+getC(var_ind)+epsilon));
-            covarnorm = log(1+getC(covar_ind)./(mu(covar_ind(:,end-1)).*mu(covar_ind(:,end))+epsilon));
-            covarnormMat = sym(zeros(n_s));
-            k=1;
-            for i=1:n_s
-                covarnormMat(i,i:n_s) = covarnorm(k:k+n_s-i);
-                k = k+n_s-i+1;
-            end
-            covarnormMat = covarnormMat + tril(transpose(covarnormMat),-1);
-        else
-            warning('Log-Normal closure is not available for 1st-order moment equations! Closure scheme was changed to Derivative-Matching!')
-            options.moment_closure = 'derivative-matching';
+    %%%%   USER-DEFINED CLOSURE
+    if strcmp(options.moment_closure,'user-defined')
+        Ii = hoI(ismember(hoM,hoM_used),:);
+        nargout_ud = nargout('ud_closure');
+        if nargout_ud == 1
+            hoM_closure = ud_closure(Ii,options.moment_order,system);
+            ind_hoM_used = [];
+        elseif nargout_ud == 2
+            [hoM_closure_user,flag_closure] = ud_closure(Ii,options.moment_order,system);
+            hoM_closure(flag_closure~=0)= hoM_closure_user(flag_closure~=0);
+            ind_hoM_used = transpose(find(flag_closure==0));
+            options.moment_closure = 'zero-cumulants';
+        elseif nargout_ud >= 3
+            [hoM_closure_user,flag_closure,moment_closure_ud] = ud_closure(Ii,options.moment_order,system);
+            hoM_closure(flag_closure~=0)= hoM_closure_user(flag_closure~=0);
+            ind_hoM_used = transpose(find(flag_closure==0));
+            options.moment_closure = moment_closure_ud;
         end
+        % CHECK FOR WHETHER THE SUBSTITUITION STILL
+        % INCLUDES ANY HIGHER-ORDER MOMENTS. IS IT NECESSARY,
+        % OR SHOULD THE USER BE REQUIRED TO MAKE SURE OF THAT?
+        %                     symvar_hoM_closure = symvar(hoM_closure2(i));
+        %                         while ~ismember(symvar_hoM_closure(isv),var_system)
+        %
+        %                         end
     end
-    if strcmp(options.moment_closure,'derivative-matching')
-        I_alpha_C = convertI2alpha(C_ind,n_s);
-        I_alpha_mu = convertI2alpha(mu_ind,n_s);
-        I_alpha = [I_alpha_mu;I_alpha_C];
-        uncentMom = convertUncent2Cent(C_ind,I_alpha_C,mu,n_s);
-        uncentMom = [mu;uncentMom];
+    if ~isempty(ind_hoM_used)
+        if strcmp(options.moment_closure,'low-dispersion')
+            %         hoM_closure2 = sym(zeros(size(hoM_used2)));
+        elseif strcmp(options.moment_closure,'log-normal')
+            if options.moment_order >= 2
+                var_ind  = covar_ind(covar_ind(:,end-1)==covar_ind(:,end),:);
+                epsilon = 1e-6;
+                munorm = log(epsilon + mu.^2./sqrt(mu.^2+getC(var_ind)+epsilon));
+                covarnorm = log(1+getC(covar_ind)./(mu(covar_ind(:,end-1)).*mu(covar_ind(:,end))+epsilon));
+                covarnormMat = sym(zeros(n_s));
+                k=1;
+                for i=1:n_s
+                    covarnormMat(i,i:n_s) = covarnorm(k:k+n_s-i);
+                    k = k+n_s-i+1;
+                end
+                covarnormMat = covarnormMat + tril(transpose(covarnormMat),-1);
+            else
+                warning('Log-Normal closure is not available for 1st-order moment equations! Closure scheme was changed to Derivative-Matching!')
+                options.moment_closure = 'derivative-matching';
+            end
+        end
+        if strcmp(options.moment_closure,'derivative-matching')
+            I_alpha_C = convertI2alpha(C_ind,n_s);
+            I_alpha_mu = convertI2alpha(mu_ind,n_s);
+            I_alpha = [I_alpha_mu;I_alpha_C];
+            uncentMom = convertUncent2Cent(C_ind,I_alpha_C,mu,n_s);
+            uncentMom = [mu;uncentMom];
+            
+        end
         
-    end
-    
-    % Closure
-    
-    for i = 1:length(hoM_used)
-        j = find(hoM==hoM_used(i));
-        Ii = hoI(j,(find(hoI(j,:)~=0)));
-        switch options.moment_closure
-            case 'low-dispersion'
-                
-            case 'mean-field'
-                uI = unique(Ii);
-                hoM_parts = sym(zeros(length(uI),1));
-                for j = 1:length(uI)
-                    Iij = Ii(Ii==uI(j));
-                    if length(Iij)==1
-                        hoM_parts(j) = getMu(Iij);
-                    else
-                        hoM_parts(j) = getC(Iij);
-                    end
+        % Closure
+        if ~strcmp(options.moment_closure,'low-dispersion')
+            %         for i = 1:length(hoM_used2)
+            for i = ind_hoM_used
+                j = find(hoM==hoM_used(i));
+                Ii = hoI(j,(find(hoI(j,:)~=0)));
+                switch options.moment_closure
+                    %             case 'low-dispersion'
+                    %
+                    case 'mean-field'
+                        uI = unique(Ii);
+                        hoM_parts = sym(zeros(length(uI),1));
+                        for j = 1:length(uI)
+                            Iij = Ii(Ii==uI(j));
+                            if length(Iij)==1
+                                hoM_parts(j) = getMu(Iij);
+                            else
+                                hoM_parts(j) = getC(Iij);
+                            end
+                        end
+                        
+                        for j = 1:length(uI)
+                            nj = sum(Ii==uI(j));
+                            hoM_parts(j) = getMu(uI(j))^nj;
+                        end
+                        
+                        hoM_closure(i) = prod(hoM_parts);
+                        
+                    case 'zero-cumulants'
+                        % generate all possible partitions in YI
+                        B = partitions(Ii);
+                        % generating cumulant corresponding to this moment
+                        K = sym(0);
+                        for b = 1:length(B)
+                            parts = [];
+                            for ib = 1:length(B{b})
+                                alpha_ib = convertI2alpha(B{b}{ib},n_s);
+                                uncentMom_ib = convertUncent2Cent(B{b}{ib},alpha_ib,mu,n_s);
+                                parts = [parts,uncentMom_ib];
+                            end
+                            npart = length(parts);
+                            K = K + factorial(npart-1) * (-1)^(npart-1) * prod(parts);
+                        end
+                        hoM_closure(i) = solve(K,hoM_used(i));
+                    case 'derivative-matching'
+                        Ii = hoI(j,:);
+                        alpha_bar = convertI2alpha(Ii,n_s);
+                        gamma_p = getDerMatchExponent(alpha_bar,I_alpha);
+                        hoM_uncent = convertUncent2Cent(Ii,alpha_bar,mu,n_s);
+                        %                 eq = hoM_uncent - prod(uncentMom.^gamma_p);
+                        eq = hoM_uncent;
+                        hoM_closure(i) = solve(eq,hoM_used(i));
+                        hoM_closure(i) = hoM_closure(i) + prod(uncentMom.^gamma_p);
+                    case 'log-normal'
+                        Ii = hoI(j,:);
+                        alpha_bar = convertI2alpha(Ii,n_s);
+                        hoM_uncent = convertUncent2Cent(Ii,alpha_bar,mu,n_s);
+                        lognormUncentMom = exp(alpha_bar*munorm + 1/2*alpha_bar*covarnormMat*alpha_bar');
+                        eq = hoM_uncent - lognormUncentMom;
+                        hoM_closure(i) = solve(eq,hoM_used(i));
+                    otherwise
+                        error('This option is not available.');
                 end
-                
-                for j = 1:length(uI)
-                    nj = sum(Ii==uI(j));
-                    hoM_parts(j) = getMu(uI(j))^nj;
-                end
-                
-                hoM_closure(i) = prod(hoM_parts);
-                
-            case 'zero-cumulants'
-                % generate all possible partitions in YI
-                B = partitions(Ii);
-                % generating cumulant corresponding to this moment
-                K = sym(0);
-                for b = 1:length(B)
-                    parts = [];
-                    for ib = 1:length(B{b})
-                        alpha_ib = convertI2alpha(B{b}{ib},n_s);
-                        uncentMom_ib = convertUncent2Cent(B{b}{ib},alpha_ib,mu,n_s);
-                        parts = [parts,uncentMom_ib];
-                    end
-                    npart = length(parts);
-                    K = K + factorial(npart-1) * (-1)^(npart-1) * prod(parts);
-                end
-                hoM_closure(i) = solve(K,hoM_used(i));
-            case 'derivative-matching'
-                Ii = hoI(j,:);
-                alpha_bar = convertI2alpha(Ii,n_s);
-                gamma_p = getDerMatchExponent(alpha_bar,I_alpha);
-                hoM_uncent = convertUncent2Cent(Ii,alpha_bar,mu,n_s);
-                %                 eq = hoM_uncent - prod(uncentMom.^gamma_p);
-                eq = hoM_uncent;
-                hoM_closure(i) = solve(eq,hoM_used(i));
-                hoM_closure(i) = hoM_closure(i) + prod(uncentMom.^gamma_p);
-            case 'log-normal'
-                Ii = hoI(j,:);
-                alpha_bar = convertI2alpha(Ii,n_s);
-                hoM_uncent = convertUncent2Cent(Ii,alpha_bar,mu,n_s);
-                lognormUncentMom = exp(alpha_bar*munorm + 1/2*alpha_bar*covarnormMat*alpha_bar');
-                eq = hoM_uncent - lognormUncentMom;
-                hoM_closure(i) = solve(eq,hoM_used(i));
-            otherwise
-                error('This option is not available.');
+            end
         end
     end
 end
-
 
 while (~isempty(setdiff(symvar(hoM_closure),var_system)))
     hoM_closure = mysubs(hoM_closure,hoM_used,hoM_closure);

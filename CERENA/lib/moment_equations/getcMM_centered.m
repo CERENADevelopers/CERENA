@@ -469,12 +469,65 @@ hoC_used = transpose(setdiff(symvar([dpdt;pdmudt;pdCdt]),[c;c_kappa;M;system.tim
 if isfield(system,'input')
     hoC_used = setdiff(symvar(hoC_used),system.input.variable);
 end
+if isfield(system,'output')
+    hoC_used = setdiff(symvar(hoC_used),system.output.variable);
+end
 choC = sym(zeros(length(hoC_used),1));
+ind_hoC_used = 1:length(hoC_used);
 if ~isempty(hoC_used)
     disp('Moment-closure used!')
-    
+    %%%%   USER-DEFINED CLOSURE
+    if strcmp(options.moment_closure,'user-defined')
+        ind_hoC_used = [];
+        for i = 1:length(hoC_used)
+            % Properties
+            for iy = 1:length(hoC)
+                if ~isempty(find(hoC{iy} == hoC_used(i)))
+                    indn = find(hoC{iy} == hoC_used(i));
+                    I = hoC_ind(indn,(find(hoC_ind(indn,:)~=0)));
+                    iy_hoC = iy;
+                end
+            end
+            nargout_ud = nargout('ud_closure');
+            if nargout_ud == 1
+                choC_user = ud_closure(I,options.moment_order,system);
+                symvar_choc = symvar(choC_user);
+                for j = 1:length(symvar_choc)
+                    choC_user = subs(choC_user, symvar_choc(j),sym([char(symvar_choc(j)),'_',y_index_str{iy_hoC}]));
+                end
+                choC(i) = choC_user;
+                %                 ind_hoC_used = [];
+            elseif nargout_ud == 2
+                [choC_user,flag_closure(i)] = ud_closure(I,options.moment_order,system);
+                if flag_closure(i) ~= 0
+                    symvar_choc = symvar(choC_user);
+                    for j = 1:length(symvar_choc)
+                        choC_user = subs(choC_user, symvar_choc(j),sym([char(symvar_choc(j)),'_',y_index_str{iy_hoC}]));
+                    end
+                    choC(i) = choC_user;
+                else
+                    ind_hoC_used = [ind_hoC_used,i];
+                end
+                options.moment_closure = 'zero-cumulants';
+            elseif nargout_ud >= 3
+                [choC_user,flag_closure(i),moment_closure_ud] = ud_closure(I,options.moment_order,system);
+                if flag_closure(i) ~= 0
+                    symvar_choc = symvar(choC_user);
+                    for j = 1:length(symvar_choc)
+                        choC_user = subs(choC_user, symvar_choc(j),sym([char(symvar_choc(j)),y_index_str{iy_hoC}]));
+                    end
+                    choC(i) = choC_user;
+                else
+                    ind_hoC_used = [ind_hoC_used,i];
+                end
+                options.moment_closure = moment_closure_ud;
+            end
+        end
+        
+    end
     % Loop: higher order moments
-    for i = 1:length(hoC_used)
+    %     for i = 1:length(hoC_used)
+    for i = 1:ind_hoC_used
         % Properties
         for iy = 1:length(hoC)
             if ~isempty(find(hoC{iy} == hoC_used(i)))

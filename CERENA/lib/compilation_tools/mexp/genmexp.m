@@ -43,7 +43,18 @@
 %                  ZC ... Zero Cumulants
 %                  DM ... Derivative Matching
 
-function [System] = genmexp(modelname,modelfile,expansion)
+% function [System] = genmexp(modelname,modelfile,expansion,System)
+function [System] = genmexp(varargin)
+if nargin >= 3
+    modelname = varargin{1};
+    modelfile = varargin{2};
+    expansion = varargin{3};
+    if nargin >= 4
+        System = varargin{4};
+    end
+else
+    error('At least three input arguments are required!')
+end
 
 % check directory of file
 modeldir = fileparts(modelfile);
@@ -106,7 +117,6 @@ if(d2d_flag)
 else
     disp('d2d-toolbox not found in path! Will not generate files')
 end
-
 
 reply = input('Do you want the MATLAB simulation files to be generated? (y/n) [n]', 's');
 if(any([strcmp(reply,'y'),strcmp(reply,'Y'),strcmp(reply,'yes')]))
@@ -207,6 +217,8 @@ if(strcmp(expansion(1:2),'ME'))
                 options.moment_closure = 'derivative-matching';
             case 'LN'
                 options.moment_closure = 'log-normal';
+            case 'UD'
+                options.moment_closure = 'user-defined';
             otherwise
                 disp('Invalid Expansion String')
                 return
@@ -224,10 +236,12 @@ if(strcmp(expansion(1:2),'ME'))
             case 'macroscopic'
                 System.scaleConversion = 'Macro_to_Micro';
         end
+        
         System = completeSystem(System);
         System.name = 'MM';
         
-        MM = getMM_centered(System,options);
+            MM = getMM_centered(System,options);
+
         System.MM = MM;
     elseif(strcmp(expansion(3:5),'UC_'))
         % UNCENTERED MOMENTS
@@ -282,9 +296,13 @@ if(strcmp(expansion(1:2),'ME'))
     syms t
     xdot = subs(xdot,System.time,t);
     x0 = subs(x0,System.time,t);
-    if strcmp(options.moment_closure,'derivative-matching')
+    if strcmp(options.moment_closure,'derivative-matching') || strcmp(options.moment_closure,'user-defined')
         ind_0 = find(x0 == 0);
         x0(ind_0) = 1e-10;
+        ind_0 = find(System.state.fmu0 == 0);
+        System.state.fmu0(ind_0) = 1e-10;
+        ind_0 = find(System.state.fC0 == 0);
+        System.state.fC0(ind_0) = 1e-10;
     end
     output = subs(output,System.time,t);
     
@@ -317,6 +335,8 @@ if(strcmp(expansion(1:3),'CME'))
                 options.moment_closure = 'zero-cumulants';
             case 'DM'
                 options.moment_closure = 'derivative-matching';
+            case 'UD'
+                options.moment_closure = 'user-defined';
             otherwise
                 disp('Invalid Expansion String')
                 return
@@ -382,10 +402,14 @@ if(strcmp(expansion(1:3),'CME'))
     MMat = CMM.derivatives.sym.mass_matrix;
     output = CMM.output.function;
     x0 = CMM.state.sym.M0;
-    if strcmp(options.moment_closure,'derivative-matching')
+    if strcmp(options.moment_closure,'derivative-matching') || strcmp(options.moment_closure,'user-defined')
         if ~isempty(x0(x0==0))
             x0(x0==0) = 1e-10;
         end
+        ind_0 = find(System.state.fmu0 == 0);
+        System.state.fmu0(ind_0) = 1e-10;
+        ind_0 = find(System.state.fC0 == 0);
+        System.state.fC0(ind_0) = 1e-10;
     end
     try
         dx0 = subs(f,states,x0)./ subs(MMat,states,x0);
@@ -416,7 +440,7 @@ if(strcmp(expansion(1:3),'CME'))
     dx0 = subs(dx0,System.time,t);
     output = subs(output,System.time,t);
 end
-
+%%
 if(strcmp(expansion,'FSP'))
     idawrap_flag = 0;
     eval(modelfile);
@@ -504,8 +528,12 @@ if(exist('xdot','var')||exist('f','var'))
             for j = 1:length(par)
                 Theta{j,1} = sprintf('Theta(%i)',j);
             end
-            for j = 1:length(kappa.variable)
-                kap{j,1} = sprintf('kappa(%i)',j);
+            if length(kappa.variable) > 0
+                for j = 1:length(kappa.variable)
+                    kap{j,1} = sprintf('kappa(%i)',j);
+                end
+            else
+                kap = [];
             end
             x = sym(x);
             Theta = sym(Theta);
@@ -778,15 +806,17 @@ if(exist('xdot','var')||exist('f','var'))
         end
         fprintf(fid,['syms ' tmpstr '\n']);
         fprintf(fid,['\n']);
-        fprintf(fid,['%% KAPPA (constant parameters)\n']);
-        fprintf(fid,['\n']);
-        
-        tmpstr = '';
-        for j=1:length(kappa.variable);
-            tmpstr = [tmpstr char(kappa.variable(j)) ' '];
+        if length(kappa.variable) > 0
+            fprintf(fid,['%% KAPPA (constant parameters)\n']);
+            fprintf(fid,['\n']);
+            
+            tmpstr = '';
+            for j=1:length(kappa.variable);
+                tmpstr = [tmpstr char(kappa.variable(j)) ' '];
+            end
+            fprintf(fid,['syms ' tmpstr '\n']);
+            fprintf(fid,['\n']);
         end
-        fprintf(fid,['syms ' tmpstr '\n']);
-        fprintf(fid,['\n']);
         fprintf(fid,['syms t\n']);
         fprintf(fid,['\n']);
         
@@ -798,13 +828,15 @@ if(exist('xdot','var')||exist('f','var'))
         fprintf(fid,['p = [' tmpstr '];\n']);
         fprintf(fid,['\n']);
         
-        tmpstr = '';
-        for j=1:length(kappa.variable)-1;
-            tmpstr = [tmpstr char(kappa.variable(j)) ','];
+        if length(kappa.variable) > 0
+            tmpstr = '';
+            for j=1:length(kappa.variable)-1;
+                tmpstr = [tmpstr char(kappa.variable(j)) ','];
+            end
+            tmpstr = [tmpstr char(kappa.variable(end)) ''];
+            fprintf(fid,['k = [' tmpstr '];\n']);
+            fprintf(fid,['\n']);
         end
-        tmpstr = [tmpstr char(kappa.variable(end)) ''];
-        fprintf(fid,['k = [' tmpstr '];\n']);
-        fprintf(fid,['\n']);
         
         fprintf(fid,['if nargin > 0\n']);
         fprintf(fid,['   f0_user = varargin{1};\n']);
@@ -918,7 +950,11 @@ if(exist('xdot','var')||exist('f','var'))
             fprintf(fid,['model.sym.M = M;\n']);
         end
         fprintf(fid,['model.sym.p = p;\n']);
-        fprintf(fid,['model.sym.k = k;\n']);
+        if length(kappa.variable) > 0
+            fprintf(fid,['model.sym.k = k;\n']);
+        else
+            fprintf(fid,['model.sym.k = [];\n']);
+        end
         fprintf(fid,['model.sym.x0 = x0;\n']);
         if (idawrap_flag)
             fprintf(fid,['model.sym.dx0 = dx0;\n']);
