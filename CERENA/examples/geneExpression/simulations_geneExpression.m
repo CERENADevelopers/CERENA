@@ -56,6 +56,14 @@ method = 'CMEC_3_ZC_2_a';
 System_MCM3 = genSimFileIDA(modelName,modelDefName,method);
 System_MCM3.sol = simulate_geneExp_MCM2(t,theta,kappa);
 plotMCM(System_MCM3)
+%% Simulation using third-order moment equations (MM3) with user-defined closure
+modelName = 'geneExp_MM3_UD';
+method = 'MEC_3_UD_2_c_f';
+System_MM3_UD = genSimFile(modelName,modelDefName,method);
+System_MM3_UD.sol = simulate_geneExp_MM3_UD(t,theta,kappa);
+options.plot_xo = 1;
+options.state_order = 2;
+plotMM(System_MM3_UD,options)
 %% Providing symbolic and numeric initial conditions before compilation of MEX files
 modelName = 'geneExp_RRE_IC';
 method = 'RRE';
