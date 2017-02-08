@@ -1,0 +1,2 @@
+New Model s	cyt ml	DNA_off mmol/ml	DNA_on mmol/ml	mRNA mmol/ml	Protein mmol/ml	tau_off 	tau_on 	k_m 	gamma_m 	k_p 	gamma_p 	tau_on_p 	k1 1/s	R1 	k1 1/s	R2 	k1 1/s	R3 	k1 1/s	R4 	k1 1/s	R5 	k1 1/s	R6 	k1 ml/(mmol*s)	R7 	
+0	1	1	0	4	10	0.2	0.2	10	1	4	1	0.015	0.015	nan	0.2	nan	10	nan	1	nan	4	nan	1	nan	0.015	nan	
