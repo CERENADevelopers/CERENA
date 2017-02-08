@@ -1,0 +1,73 @@
+\contentsline {chapter}{\numberline {1}Introduction to stochastic chemical kinetics}{3}{chapter.1}
+\contentsline {section}{\numberline {1.1}Chemical reaction networks}{3}{section.1.1}
+\contentsline {subsubsection}{Microscopic and macroscopic propensities and parameters.}{4}{section*.3}
+\contentsline {section}{\numberline {1.2}Example: The three-stage gene expression model}{5}{section.1.2}
+\contentsline {section}{\numberline {1.3}Modeling and simulation approaches}{7}{section.1.3}
+\contentsline {subsection}{\numberline {1.3.1}Stochastic Simulation Algorithm}{7}{subsection.1.3.1}
+\contentsline {subsection}{\numberline {1.3.2}Finite State Projection}{8}{subsection.1.3.2}
+\contentsline {subsection}{\numberline {1.3.3}Reaction Rate Equations}{8}{subsection.1.3.3}
+\contentsline {subsection}{\numberline {1.3.4}System Size Expansion}{9}{subsection.1.3.4}
+\contentsline {subsection}{\numberline {1.3.5}Method of Moments}{9}{subsection.1.3.5}
+\contentsline {subsection}{\numberline {1.3.6}Method of Conditional Moments}{10}{subsection.1.3.6}
+\contentsline {section}{\numberline {1.4}Sensitivity analysis}{12}{section.1.4}
+\contentsline {subsection}{\numberline {1.4.1}Forward sensitivity equations}{12}{subsection.1.4.1}
+\contentsline {subsection}{\numberline {1.4.2}Adjoint sensitivity equations}{13}{subsection.1.4.2}
+\contentsline {section}{\numberline {1.5}Likelihood function evaluation}{13}{section.1.5}
+\contentsline {chapter}{\numberline {2}{CERENA} startup}{14}{chapter.2}
+\contentsline {section}{\numberline {2.1}Installation}{14}{section.2.1}
+\contentsline {section}{\numberline {2.2}Requirements}{15}{section.2.2}
+\contentsline {chapter}{\numberline {3}Setting up a model in {CERENA}}{16}{chapter.3}
+\contentsline {section}{\numberline {3.1}Model definition file}{16}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Example: The three-stage gene expression model}{20}{subsection.3.1.1}
+\contentsline {section}{\numberline {3.2}SBML Import}{22}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Example: The three-stage gene expression model}{22}{subsection.3.2.1}
+\contentsline {chapter}{\numberline {4}Compiling Simulation Files}{23}{chapter.4}
+\contentsline {section}{\numberline {4.1}Generation of simulation files}{23}{section.4.1}
+\contentsline {subsection}{\lstinline {completeSystem()}}{23}{section*.9}
+\contentsline {subsection}{\lstinline {genmexp()}}{23}{section*.10}
+\contentsline {subsection}{\lstinline {amiwrap()}}{24}{section*.11}
+\contentsline {section}{\numberline {4.2}Specification of modeling approach}{24}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}System Size Expansion}{24}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}Method of Moments}{25}{subsection.4.2.2}
+\contentsline {subsection}{\numberline {4.2.3}Scalable Moment Approximation method (sMA)}{26}{subsection.4.2.3}
+\contentsline {subsection}{\numberline {4.2.4}Method of Conditional Moments}{26}{subsection.4.2.4}
+\contentsline {subsection}{\numberline {4.2.5}Finite State Projection}{27}{subsection.4.2.5}
+\contentsline {subsection}{\numberline {4.2.6}Symbolic representation}{28}{subsection.4.2.6}
+\contentsline {subsection}{\numberline {4.2.7}Other formats}{28}{subsection.4.2.7}
+\contentsline {section}{\numberline {4.3}Compilation of simulation MEX-files}{28}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}Rewriting the initial conditions before the compilation of MEX-files}{28}{subsection.4.3.1}
+\contentsline {section}{\numberline {4.4}Example: The three-stage gene expression model}{28}{section.4.4}
+\contentsline {chapter}{\numberline {5}Numerical simulation and sensitivity analysis}{30}{chapter.5}
+\contentsline {section}{\numberline {5.1}Numerical simulation of the system}{30}{section.5.1}
+\contentsline {subsubsection}{Example: The three-stage gene expression model}{32}{section*.13}
+\contentsline {section}{\numberline {5.2}Numerical simulation with arbitrary initial conditions}{32}{section.5.2}
+\contentsline {section}{\numberline {5.3}Sensitivity analysis}{33}{section.5.3}
+\contentsline {subsection}{\numberline {5.3.1}Forward sensitivity analysis}{34}{subsection.5.3.1}
+\contentsline {subsubsection}{Example: The three-stage gene expression model}{34}{section*.14}
+\contentsline {subsection}{\numberline {5.3.2}Adjoint sensitivity analysis}{35}{subsection.5.3.2}
+\contentsline {subsubsection}{Example: The three-stage gene expression model}{35}{section*.15}
+\contentsline {section}{\numberline {5.4}MATLAB-based simulation file}{35}{section.5.4}
+\contentsline {section}{\numberline {5.5}MATLAB-based \acrshort {fsp} simulation}{36}{section.5.5}
+\contentsline {chapter}{\numberline {6}\acrshort {ssa} simulation}{38}{chapter.6}
+\contentsline {section}{\numberline {6.1}Description}{38}{section.6.1}
+\contentsline {subsection}{\numberline {6.1.1}Constant propensities}{39}{subsection.6.1.1}
+\contentsline {subsection}{\numberline {6.1.2}Time-dependent propensities}{39}{subsection.6.1.2}
+\contentsline {subsubsection}{Other options}{39}{section*.16}
+\contentsline {section}{\numberline {6.2}Example: The three-stage gene expression model}{39}{section.6.2}
+\contentsline {chapter}{\numberline {7}Post-processing and visualization of simulation results}{41}{chapter.7}
+\contentsline {section}{\numberline {7.1}Visualization of trajectories}{41}{section.7.1}
+\contentsline {subsection}{\numberline {7.1.1}Visualization of \acrshort {mm} simulation results}{41}{subsection.7.1.1}
+\contentsline {subsection}{\numberline {7.1.2}Visualization of \acrshort {sse} simulation results}{42}{subsection.7.1.2}
+\contentsline {subsection}{\numberline {7.1.3}Visualization of \acrshort {mcm} simulation results}{42}{subsection.7.1.3}
+\contentsline {subsection}{\numberline {7.1.4}Visualization of \acrshort {fsp} simulation results}{43}{subsection.7.1.4}
+\contentsline {subsection}{\numberline {7.1.5}Visualization of \acrshort {ssa} simulation results}{43}{subsection.7.1.5}
+\contentsline {subsection}{\numberline {7.1.6}Visualization of several simulation results}{44}{subsection.7.1.6}
+\contentsline {subsection}{\numberline {7.1.7}General options}{44}{subsection.7.1.7}
+\contentsline {section}{\numberline {7.2}Visualization of correlation and partial correlation}{44}{section.7.2}
+\contentsline {subsection}{\numberline {7.2.1}Correlation map}{44}{subsection.7.2.1}
+\contentsline {subsection}{\numberline {7.2.2}Partial correlation map}{45}{subsection.7.2.2}
+\contentsline {section}{\numberline {7.3}Example: The three-stage gene expression model}{45}{section.7.3}
+\contentsline {chapter}{\numberline {8}Further examples}{51}{chapter.8}
+\contentsline {section}{\numberline {8.1}JAK-STAT signaling pathway}{51}{section.8.1}
+\contentsline {section}{\numberline {8.2}PapI regulation model}{54}{section.8.2}
+\contentsline {section}{\numberline {8.3}A gene cascade network}{54}{section.8.3}

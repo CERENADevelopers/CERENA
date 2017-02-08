@@ -66,7 +66,11 @@ if options.moment_order == 3
         I = union(I,system.I_o3,'rows');
     end
 end
-
+% add extra columns due to maxOrder
+nAddCol = options.moment_order_max - size(I,2);
+for i=1:nAddCol
+    I = [zeros(size(I,1),1),I];
+end
     % Generation of I-index
 [Iall ,~] = getMomentIndexSet(n_s ,options.moment_order_max);
 % hoI = I(find(sum(I~=0,2)> options.moment_order),:);
