@@ -35,14 +35,12 @@ options.state_order = 2;
 plotMM(System_sMA,options)
 
 %% Simulation using second-order moment equations (MM2) with low dispersion closure
-% modelName = 'geneExpressionMCM';
-% method = 'CMEC_1_LD_1_c';
-% System_MCM = genmexp(modelName,modelDefName,method);
-% amiwrap(modelName,[method,'_',modelName,'_syms'])
-% %%
-% [status_MCM,tout_MCM,x_MCM,dx_MCM,mx_MCM,y_MCM] = simulate_geneExpressionMCM(t,theta,kappa);
-% %%
-% System_MCM.sol = simulate_geneExpressionMCM(t,theta,kappa);
-% options.plot_xo = 1;
-% options.state_order = 2;
-% plotMCM(System_MCM,options)
+modelName = 'geneExpressionMCM';
+method = 'CMEC_1_LD_1_c';
+System_MCM = genmexp(modelName,modelDefName,method);
+amiwrap(modelName,[method,'_',modelName,'_syms'])
+%%
+System_MCM.sol = simulate_geneExpressionMCM(t,theta,kappa);
+options.plot_xo = 1;
+options.state_order = 2;
+plotMCM(System_MCM,options)
