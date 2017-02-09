@@ -120,13 +120,13 @@ else
     disp('d2d-toolbox not found in path! Will not generate files')
 end
 
-matlab_flag = 1;
-% reply = input('Do you want the MATLAB simulation files to be generated? (y/n) [n]', 's');
-% if(any([strcmp(reply,'y'),strcmp(reply,'Y'),strcmp(reply,'yes')]))
-%     matlab_flag = 1;
-% else
-%     matlab_flag = 0;
-% end
+% matlab_flag = 1;
+reply = input('Do you want the MATLAB simulation files to be generated? (y/n) [n]', 's');
+if(any([strcmp(reply,'y'),strcmp(reply,'Y'),strcmp(reply,'yes')]))
+    matlab_flag = 1;
+else
+    matlab_flag = 0;
+end
 
 % if neither of them is found, abort. Maybe we should then just generate respective files in the same directory?
 if(not(any([idawrap_flag,cvodewrap_flag,d2d_flag,matlab_flag])))

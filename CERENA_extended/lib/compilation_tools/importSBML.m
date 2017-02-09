@@ -1,4 +1,9 @@
 function System = importSBML(modelname)
+tmpstr = which('TranslateSBML.m');
+noSbml_flag = strcmp(tmpstr,['']);
+if (noSbml_flag)
+    error('SBML Toolbox not found on the search path! Install SBML Toolbox or add to the path!')
+end
 try
     model = TranslateSBML([modelname '.sbml']);
 catch
