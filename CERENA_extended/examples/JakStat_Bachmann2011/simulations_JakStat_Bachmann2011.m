@@ -13,42 +13,34 @@ scaleRNA_CIS = 1e4;
 tmp = find(strcmp(System_MM2_f.parameter.name,'CISRNATurn'));
 theta(tmp) = theta(tmp)/scaleRNA_CIS;
 %% Derivation of MA and sMA equations of degree 1, 2 and 3;
-%%%% This will take a while; instead you can use the pregenerated models
-%%%% below.
+%%%% This will take a while;
 
-% %% full MM simulation
-% modelName = 'JS_MSB_MM2_f_a';
-% method = 'MEC_2_LD_1_a_f_2';
-% System_MM2_f = genmexp(modelName,modelDefName,method);
-% amiwrap(modelName,[method,'_',modelName,'_syms'])
-% disp('MM2_f done')
-% %% reduced MM with zero closure
-% modelName = 'JS_MSB_MM2_g_a';
-% method = 'MEC_2_LD_1_a_g_2';
-% System_MM2_g = genmexp(modelName,modelDefName,method);
-% amiwrap(modelName,[method,'_',modelName,'_syms'])
-% disp('MM2_g done')
-% %% reduced MM order 2 with zero closure
-% modelName = 'JS_MSB_MM2_g2_a';
-% method = 'MEC_2_LD_1_a_g_2';
-% System_MM2_g2.reduction_order = 2;
-% System_MM2_g2 = genmexp(modelName,modelDefName,method,System_MM2_g2);
-% amiwrap(modelName,[method,'_',modelName,'_syms'])
-% disp('MM2_g2 done')
-% %% reduced MM order 3 with zero closure
-% modelName = 'JS_MSB_MM2_g3_a';
-% method = 'MEC_2_LD_1_a_g_2';
-% System_MM2_g3.reduction_order = 3;
-% System_MM2_g3 = genmexp(modelName,modelDefName,method,System_MM2_g3);
-% amiwrap(modelName,[method,'_',modelName,'_syms'])
-% disp('MM2_g3 done')
-%%
-load('JS_MSB_MM2_g_a_MEC_2_LD_1_a_g_2_System.mat')
-System_MM2_g = System;
-load('JS_MSB_MM2_g2_a_MEC_2_LD_1_a_g_2_System.mat')
-System_MM2_g2 = System;
-load('JS_MSB_MM2_g3_a_MEC_2_LD_1_a_g_2_System.mat')
-System_MM2_g3 = System;
+%% full MM simulation
+modelName = 'JS_MSB_MM2_f_a';
+method = 'MEC_2_LD_1_a_f_2';
+System_MM2_f = genmexp(modelName,modelDefName,method);
+amiwrap(modelName,[method,'_',modelName,'_syms'])
+disp('MM2_f done')
+%% reduced MM with zero closure
+modelName = 'JS_MSB_MM2_g_a';
+method = 'MEC_2_LD_1_a_g_2';
+System_MM2_g = genmexp(modelName,modelDefName,method);
+amiwrap(modelName,[method,'_',modelName,'_syms'])
+disp('MM2_g done')
+%% reduced MM order 2 with zero closure
+modelName = 'JS_MSB_MM2_g2_a';
+method = 'MEC_2_LD_1_a_g_2';
+System_MM2_g2.reduction_order = 2;
+System_MM2_g2 = genmexp(modelName,modelDefName,method,System_MM2_g2);
+amiwrap(modelName,[method,'_',modelName,'_syms'])
+disp('MM2_g2 done')
+%% reduced MM order 3 with zero closure
+modelName = 'JS_MSB_MM2_g3_a';
+method = 'MEC_2_LD_1_a_g_2';
+System_MM2_g3.reduction_order = 3;
+System_MM2_g3 = genmexp(modelName,modelDefName,method,System_MM2_g3);
+amiwrap(modelName,[method,'_',modelName,'_syms'])
+disp('MM2_g3 done')
 
 %% simulations
 System_MM2_f.sol = simulate_JS_MSB_MM2_f_a(t,theta,kappa);
